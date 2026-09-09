@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Phiếu nhập liệu – Chất lượng chuối</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --peel:#F6C90E;
+    --peel-deep:#E0A600;
+    --leaf:#2F5233;
+    --leaf-deep:#1E3A22;
+    --leaf-pale:#E7EFE3;
+    --bruise:#8B5A2B;
+    --paper:#FBF9F3;
+    --paper-dim:#F0EDE2;
+    --ink:#25291F;
+    --ink-soft:#5B6152;
+    --line:#DDD8C6;
+    --danger:#B4432B;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(37,41,31,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper-dim);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-tap-highlight-color:transparent;
+    padding-bottom:100px;
+  }
+  ::selection{background:var(--peel);}
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:var(--leaf);
+    color:var(--paper);
+    padding:14px 16px 12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand-mark{
+    width:34px; height:34px; border-radius:9px;
+    background:var(--peel);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .brand-mark svg{width:20px;height:20px;}
+  .brand h1{
+    font-size:15.5px; font-weight:700; margin:0; letter-spacing:0.1px; line-height:1.25;
+  }
+  .brand p{margin:1px 0 0; font-size:11.5px; color:#C9D8C6; font-weight:500;}
+  .header-row2{
+    display:flex; align-items:center; gap:8px; margin-top:12px;
+  }
+  .date-pill{
+    display:flex; align-items:center; gap:7px;
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:10px;
+    padding:7px 10px;
+    flex:1;
+  }
+  .date-pill svg{width:15px;height:15px;flex-shrink:0;opacity:0.85;}
+  .date-pill input{
+    background:transparent; border:none; color:var(--paper);
+    font-size:13.5px; font-weight:600; width:100%; font-family:inherit;
+  }
+  .date-pill input::-webkit-calendar-picker-indicator{filter:invert(1);opacity:0.8;}
+  .count-pill{
+    background:var(--peel); color:var(--leaf-deep);
+    font-weight:800; font-size:13px;
+    border-radius:10px; padding:7px 12px;
+    white-space:nowrap;
+  }
+
+  /* ---------- Tabs ---------- */
+  .tabbar{
+    display:flex; background:var(--paper); border-bottom:1px solid var(--line);
+    position:sticky; top:86px; z-index:40;
+  }
+  .tabbar.hasdate{top:98px;}
+  .tab{
+    flex:1; text-align:center; padding:11px 6px; font-size:13px; font-weight:700;
+    color:var(--ink-soft); border-bottom:3px solid transparent; cursor:pointer;
+  }
+  .tab.active{color:var(--leaf-deep); border-bottom-color:var(--peel);}
+  .tab .badge{
+    display:inline-block; min-width:17px; padding:0 4px; margin-left:5px;
+    background:var(--leaf-pale); color:var(--leaf-deep); border-radius:20px;
+    font-size:10.5px; font-weight:800;
+  }
+
+  main{padding:14px 12px 4px; max-width:640px; margin:0 auto;}
+
+  /* ---------- Cards / sections ---------- */
+  .card{
+    background:var(--paper); border-radius:var(--radius);
+    padding:14px; margin-bottom:12px; box-shadow:var(--shadow);
+    border:1px solid var(--line);
+  }
+  .sec-title{
+    font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;
+    color:var(--ink-soft); margin:0 0 10px;
+  }
+
+  /* ---------- Form fields ---------- */
+  .field{margin-bottom:12px;}
+  .field:last-child{margin-bottom:0;}
+  label.flabel{
+    display:block; font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:6px;
+  }
+  .req::after{content:" *"; color:var(--danger);}
+  select, input[type=text], input[type=number], textarea{
+    width:100%; padding:11px 12px; font-size:15.5px; border-radius:10px;
+    border:1.5px solid var(--line); background:var(--paper); color:var(--ink);
+    font-family:inherit; appearance:none; -webkit-appearance:none;
+  }
+  select{
+    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%235B6152" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>');
+    background-repeat:no-repeat; background-position:right 12px center; padding-right:32px;
+  }
+  select:focus, input:focus, textarea:focus{
+    outline:none; border-color:var(--leaf); box-shadow:0 0 0 3px rgba(47,82,51,0.12);
+  }
+  textarea{resize:vertical; min-height:56px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+
+  .score-wrap{display:flex; align-items:center; gap:10px;}
+  .score-wrap input{text-align:center; font-size:22px; font-weight:800; color:var(--leaf-deep);}
+  .stepbtn{
+    width:44px; height:44px; border-radius:10px; border:1.5px solid var(--line);
+    background:var(--paper); font-size:20px; font-weight:700; color:var(--leaf-deep);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; user-select:none;
+  }
+  .stepbtn:active{background:var(--leaf-pale);}
+
+  /* ---------- Defect chip grid ---------- */
+  .chip-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:8px;
+  }
+  @media (min-width:480px){ .chip-grid{grid-template-columns:1fr 1fr 1fr;} }
+  .chip{
+    display:flex; align-items:center; gap:7px;
+    border:1.5px solid var(--line); border-radius:10px;
+    padding:10px 8px; font-size:13px; font-weight:600; color:var(--ink);
+    background:var(--paper); user-select:none; line-height:1.2;
+  }
+  .chip .box{
+    width:19px; height:19px; border-radius:5px; border:1.5px solid #B8B29A;
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    background:var(--paper);
+  }
+  .chip .box svg{width:13px;height:13px;opacity:0;stroke:white;stroke-width:3;}
+  .chip.on{
+    background:var(--leaf-pale); border-color:var(--leaf);
+  }
+  .chip.on .box{background:var(--leaf); border-color:var(--leaf);}
+  .chip.on .box svg{opacity:1;}
+  .defect-count{
+    font-size:11.5px; font-weight:700; color:var(--leaf-deep); margin-bottom:8px;
+  }
+
+  /* ---------- Chỉ số (số trái / cỡ trái / trọng lượng) ---------- */
+  .chiso-block{
+    border:1.5px solid var(--line); border-radius:12px; padding:12px;
+    margin-bottom:12px; background:var(--paper-dim);
+  }
+  .chiso-block-head{
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;
+  }
+  .chiso-block-title{font-size:12.5px; font-weight:800; color:var(--leaf-deep); text-transform:uppercase; letter-spacing:0.3px;}
+  .chiso-fields{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;}
+  .chiso-fields .mini-field label{
+    display:block; font-size:10px; font-weight:700; color:var(--ink-soft); margin-bottom:4px;
+  }
+  .chiso-fields .mini-field input{padding:9px 8px; font-size:14px; text-align:center;}
+  .chiso-del{
+    width:32px; height:32px; border-radius:8px; border:1.5px solid #EBCFC7;
+    background:var(--paper); color:var(--danger); font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .btn-add-row{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    padding:10px; border-radius:10px; border:1.5px dashed var(--leaf);
+    color:var(--leaf-deep); font-weight:700; font-size:13px; background:var(--leaf-pale);
+    width:100%; margin-top:2px;
+  }
+  .chiso-total{
+    margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);
+    font-size:13px; font-weight:700; color:var(--leaf-deep); text-align:right;
+  }
+
+  /* ---------- Bảng lỗi riêng theo từng thùng (accordion) ---------- */
+  .chiso-defects{margin-top:10px;}
+  .chiso-defects summary{
+    list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+    padding:9px 10px; border-radius:9px; background:var(--paper); border:1.5px solid var(--line);
+    font-size:12.5px; font-weight:700; color:var(--ink);
+  }
+  .chiso-defects summary::-webkit-details-marker{display:none;}
+  .chiso-defects summary .chev{transition:transform .15s; opacity:0.6; font-size:11px;}
+  .chiso-defects[open] summary .chev{transform:rotate(180deg);}
+  .chiso-defects summary .sumcount{color:var(--leaf-deep); font-weight:800;}
+  .chiso-defects-body{
+    background:var(--paper); border:1.5px solid var(--line); border-top:none;
+    border-radius:0 0 9px 9px; padding:4px 10px;
+  }
+  .chiso-note-wrap{margin-top:6px; padding-top:10px; border-top:1px dashed var(--line);}
+  .chiso-note-label{display:block; font-size:11px; font-weight:700; color:var(--ink-soft); margin-bottom:6px;}
+  .chiso-note-input{min-height:38px; font-size:13px; padding:8px 10px;}
+  .chiso-note-levels{display:flex; flex-direction:column; gap:7px;}
+  .chiso-note-item{display:flex; align-items:flex-start; gap:8px;}
+  .chiso-note-tag{
+    flex:0 0 38px; text-align:center; font-size:9.5px; font-weight:800; text-transform:uppercase;
+    padding:8px 2px; border-radius:7px; line-height:1.1;
+  }
+  .chiso-note-tag.lvl-nhe{background:#FFF8E1; color:#8a6d1c; border:1.5px solid #E9D28A;}
+  .chiso-note-tag.lvl-tb{background:#FFF1E1; color:#8a4d1c; border:1.5px solid #E9B98A;}
+  .chiso-note-tag.lvl-nang{background:#FBEAE6; color:var(--danger); border:1.5px solid #EBCFC7;}
+  .defect-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:9px 0; border-bottom:1px solid var(--line);
+  }
+  .defect-row:last-child{border-bottom:none;}
+  .defect-label{flex:1 1 auto; font-size:12.5px; font-weight:600; color:var(--ink); line-height:1.25;}
+  .heavy-tag{display:block; font-size:9px; font-weight:800; color:var(--danger); margin-top:2px; text-transform:uppercase;}
+  .sev-inputs{display:flex; gap:6px; flex-shrink:0;}
+  .sev-field{display:flex; flex-direction:column; align-items:center; width:46px;}
+  .sev-field input{
+    width:100%; text-align:center; padding:7px 2px; font-size:13.5px; font-weight:700;
+    border-radius:8px; border:1.5px solid var(--line); background:var(--paper); color:var(--ink);
+  }
+  .sev-field input:focus{outline:none; border-color:var(--leaf); box-shadow:0 0 0 2px rgba(47,82,51,0.12);}
+  .sev-field.lvl-nhe input:not([value="0"]):not([value=""]){border-color:#C9A227; background:#FFF8E1;}
+  .sev-field.lvl-tb input:not([value="0"]):not([value=""]){border-color:#C97A27; background:#FFF1E1;}
+  .sev-field.lvl-nang input:not([value="0"]):not([value=""]){border-color:var(--danger); background:#FBEAE6;}
+  .sev-tag{font-size:9px; color:var(--ink-soft); margin-top:3px; font-weight:800; text-transform:uppercase;}
+
+  /* ---------- Thẻ điểm tự động ---------- */
+  .score-card{
+    background:linear-gradient(135deg, var(--leaf) 0%, var(--leaf-deep) 100%);
+    border-radius:var(--radius); padding:16px; margin-bottom:12px; color:var(--paper);
+    box-shadow:var(--shadow);
+  }
+  .score-card .sec-title{color:#C9D8C6;}
+  .score-big{font-size:38px; font-weight:900; line-height:1; margin:2px 0 10px;}
+  .score-big span{font-size:17px; font-weight:700; opacity:0.85;}
+  .score-stats{display:flex; gap:14px; flex-wrap:wrap;}
+  .score-stat{font-size:12px; color:#DCE7D9;}
+  .score-stat b{display:block; font-size:15px; color:var(--paper); font-weight:800;}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    padding:14px; border-radius:12px; font-size:15px; font-weight:800;
+    border:none; cursor:pointer; width:100%; font-family:inherit;
+  }
+  .btn svg{width:17px;height:17px;flex-shrink:0;}
+  .btn-primary{background:var(--leaf); color:var(--paper);}
+  .btn-primary:active{background:var(--leaf-deep);}
+  .btn-ghost{background:transparent; color:var(--ink-soft); border:1.5px solid var(--line);}
+  .btn-export{
+    background:var(--peel); color:var(--leaf-deep);
+  }
+  .btn-export:active{background:var(--peel-deep);}
+  .btn-danger{background:var(--danger); color:white;}
+
+  /* ---------- Entry list ---------- */
+  .entry{
+    background:var(--paper); border-radius:12px; padding:12px 13px; margin-bottom:9px;
+    box-shadow:var(--shadow); border:1px solid var(--line);
+  }
+  .entry-top{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
+  .entry-name{font-size:15px; font-weight:800; color:var(--ink);}
+  .entry-sub{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+  .entry-score{
+    font-size:19px; font-weight:800; color:var(--leaf-deep); white-space:nowrap;
+  }
+  .entry-defects{
+    font-size:12.5px; color:var(--ink-soft); margin-top:7px; line-height:1.5;
+  }
+  .entry-actions{display:flex; gap:8px; margin-top:10px;}
+  .mini-btn{
+    flex:1; padding:8px; border-radius:8px; font-size:12.5px; font-weight:700;
+    border:1.5px solid var(--line); background:var(--paper); color:var(--ink-soft);
+  }
+  .mini-btn.del{color:var(--danger); border-color:#EBCFC7;}
+  .mini-btn.edit{color:var(--leaf-deep); border-color:var(--leaf);}
+
+  .empty{
+    text-align:center; padding:44px 20px; color:var(--ink-soft);
+  }
+  .empty svg{width:44px;height:44px;opacity:0.35;margin-bottom:10px;}
+  .empty p{font-size:13.5px; margin:2px 0;}
+
+  /* ---------- Bottom bar ---------- */
+  .bottombar{
+    position:fixed; bottom:0; left:0; right:0; z-index:50;
+    background:var(--paper); border-top:1px solid var(--line);
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    display:flex; gap:9px; max-width:640px; margin:0 auto;
+    box-shadow:0 -2px 10px rgba(0,0,0,0.06);
+  }
+
+  .toast{
+    position:fixed; bottom:78px; left:50%; transform:translateX(-50%);
+    background:var(--leaf-deep); color:var(--paper);
+    padding:10px 18px; border-radius:30px; font-size:13px; font-weight:700;
+    box-shadow:0 4px 14px rgba(0,0,0,0.25); z-index:100;
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+
+  .summary-table{width:100%; border-collapse:collapse; font-size:12px;}
+  .summary-table th, .summary-table td{
+    padding:7px 6px; text-align:center; border-bottom:1px solid var(--line);
+  }
+  .summary-table th{
+    color:var(--ink-soft); font-weight:700; font-size:10.5px; text-transform:uppercase;
+    letter-spacing:0.2px; background:var(--paper-dim); position:sticky; top:0;
+  }
+  .summary-table td:nth-child(2){text-align:left; font-weight:700;}
+  .summary-scroll{overflow-x:auto; border-radius:10px;}
+  .summary-scroll::-webkit-scrollbar{height:6px;}
+
+  .hint{font-size:11.5px; color:var(--ink-soft); margin-top:4px; line-height:1.4;}
+
+  dialog{
+    border:none; border-radius:16px; padding:0; width:min(340px,90vw);
+    box-shadow:0 10px 40px rgba(0,0,0,0.25);
+  }
+  dialog::backdrop{background:rgba(20,24,16,0.45);}
+  .dialog-body{padding:20px;}
+  .dialog-body h3{margin:0 0 8px; font-size:16px;}
+  .dialog-body p{margin:0 0 16px; font-size:13.5px; color:var(--ink-soft); line-height:1.5;}
+  .dialog-actions{display:flex; gap:8px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1E3A22" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 14c2 5 8 7 12 4 3-2 4-6 3-9"/>
+        <path d="M19 9c1-3 0-5-1-6"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Đánh giá chất lượng chuối</h1>
+      <p>Phiếu nhập liệu sau đóng gói</p>
+    </div>
+  </div>
+  <div class="header-row2">
+    <div class="date-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      <input type="date" id="workDate">
+    </div>
+    <div class="count-pill" id="countPill">0 phiếu</div>
+  </div>
+</header>
+
+<div class="tabbar hasdate">
+  <div class="tab active" data-tab="nhap" id="tabNhap">Nhập liệu</div>
+  <div class="tab" data-tab="list" id="tabList">Danh sách<span class="badge" id="listBadge">0</span></div>
+  <div class="tab" data-tab="sum" id="tabSum">Tổng hợp</div>
+</div>
+
+<main>
+
+  <!-- ============ NHẬP LIỆU TAB ============ -->
+  <section id="pane-nhap">
+
+    <div class="card">
+      <p class="sec-title">Thông tin lô hàng</p>
+      <div class="row2">
+        <div class="field">
+          <label class="flabel req">Tên người đóng</label>
+          <input type="text" id="f-ten" list="dl-ten" placeholder="Chọn hoặc gõ tên mới…" autocomplete="off">
+          <datalist id="dl-ten"></datalist>
+        </div>
+        <div class="field">
+          <label class="flabel">Số line</label>
+          <input type="text" id="f-line" placeholder="VD: Line 1">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label class="flabel">Loại</label>
+          <select id="f-loai">
+            <option value="">— Chọn —</option>
+            <option value="KHOÁN">KHOÁN</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="flabel req">Mã hàng</label>
+          <select id="f-ma"></select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label class="flabel req">Thị trường</label>
+          <select id="f-tt"></select>
+        </div>
+        <div class="field">
+          <label class="flabel">Nhân viên kiểm phẩm</label>
+          <select id="f-nv"></select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label class="flabel">Mã thùng</label>
+          <input type="text" id="f-mathung" placeholder="VD: TH001">
+        </div>
+        <div class="field">
+          <label class="flabel">Trọng lượng thùng (kg)</label>
+          <input type="number" min="0" step="0.1" inputmode="decimal" id="f-tlthung" placeholder="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="sec-title">Chỉ số &amp; lỗi trong thùng này</p>
+      <div id="chisoList"></div>
+      <div class="btn-add-row" id="btnAddChiso">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Thêm chỉ số (dòng mới)
+      </div>
+      <div class="chiso-total" id="chisoTotal">Tổng số trái: 0</div>
+      <p class="hint">Mỗi PHIẾU = 1 THÙNG. Mỗi dòng "Chỉ số" bên dưới ứng với 1 dòng trên mẫu giấy, có Số trái, Cỡ trái, Trọng lượng và bảng lỗi riêng. Chạm "Lỗi của chỉ số này" để mở/đóng bảng lỗi. Các lỗi từ "Gãy cuống" đến "Thiếu kg" chỉ ghi nhận ở mức Nặng. Ghi chú lỗi phát sinh thêm cũng chia theo 3 mức Nhẹ/TB/Nặng.</p>
+    </div>
+
+    <div class="score-card">
+      <p class="sec-title">Điểm chất lượng (tự động)</p>
+      <div class="score-big" id="scoreBig">0<span>/100</span></div>
+      <div class="score-stats">
+        <div class="score-stat">Tổng số trái<b id="statTrai">0</b></div>
+        <div class="score-stat">Tổng lỗi quy đổi<b id="statLoi">0</b></div>
+        <div class="score-stat">Nhẹ · TB · Nặng<b id="statLevels">0 · 0 · 0</b></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="btnAdd">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Thêm phiếu
+    </button>
+    <button class="btn btn-ghost" id="btnCancelEdit" style="display:none;margin-top:8px;">Hủy chỉnh sửa</button>
+  </section>
+
+  <!-- ============ DANH SÁCH TAB ============ -->
+  <section id="pane-list" style="display:none;">
+    <div id="entryList"></div>
+    <div class="empty" id="emptyList" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      <p><strong>Chưa có phiếu nào</strong></p>
+      <p>Sang tab "Nhập liệu" để bắt đầu</p>
+    </div>
+  </section>
+
+  <!-- ============ TỔNG HỢP TAB ============ -->
+  <section id="pane-sum" style="display:none;">
+    <div class="card">
+      <p class="sec-title">Trung bình theo người đóng — <span id="sumDateLabel"></span></p>
+      <div class="summary-scroll">
+        <table class="summary-table" id="sumTable"></table>
+      </div>
+      <p class="hint">Chỉ tính các lỗi có phát sinh. Điểm TB và Lỗi TB/trái theo số phiếu của từng người.</p>
+    </div>
+  </section>
+
+</main>
+
+<div class="bottombar">
+  <button class="btn btn-ghost" id="btnClear" style="flex:0 0 auto; width:52px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg>
+  </button>
+  <button class="btn btn-export" id="btnExport">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+    Xuất file Excel
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<dialog id="addItemDialog">
+  <div class="dialog-body">
+    <h3 id="addItemTitle">Thêm mới</h3>
+    <p id="addItemMsg">Nhập giá trị mới, sẽ được lưu vào danh mục chung cho mọi người dùng ứng dụng này.</p>
+    <div class="field">
+      <input type="text" id="addItemInput" placeholder="Ví dụ: NAM">
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" id="addItemCancel">Hủy</button>
+      <button class="btn btn-primary" id="addItemOk">Lưu</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="confirmDialog">
+  <div class="dialog-body">
+    <h3 id="confirmTitle">Xác nhận</h3>
+    <p id="confirmMsg"></p>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" id="confirmCancel">Hủy</button>
+      <button class="btn btn-danger" id="confirmOk">Xóa</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+/* ============================================================
+   CÔNG TẮC KHÓA TỪ XA (kiểm tra file status.json trên GitHub)
+   ============================================================ */
+const LOCK_STATUS_URL = 'https://raw.githubusercontent.com/bnp1104/cong-tac-khoa/main/status.json';
+
+async function checkLockStatus(){
+  try{
+    const res = await fetch(LOCK_STATUS_URL + '?t=' + Date.now(), {cache: 'no-store'});
+    if(!res.ok) return false; // không đọc được -> không khóa (fail-open)
+    const data = await res.json();
+    return data && data.locked === true;
+  }catch(err){
+    console.warn('Không kiểm tra được trạng thái khóa (có thể do mất mạng):', err);
+    return false; // mất mạng / lỗi -> không khóa, để không chặn nhầm người dùng
+  }
+}
+
+function showLockedScreen(){
+  document.body.innerHTML = `
+    <div style="
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      flex-direction:column; gap:12px; text-align:center; padding:24px;
+      font-family:Arial, sans-serif; background:#1f2937; color:#fff;">
+      <div style="font-size:48px;">🔒</div>
+      <div style="font-size:20px; font-weight:bold;">Công cụ hiện đã bị khóa</div>
+      <div style="font-size:14px; color:#cbd5e1; max-width:360px;">
+        Vui lòng liên hệ người quản trị nếu bạn cần tiếp tục sử dụng.
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   DANH MỤC (đồng bộ với sheet "Danh mục" của file gốc)
+   ============================================================ */
+let NAMES = ["AN","BEO","BI","DANH","DIỆU","ĐẠT","HÀ","HẬU","HÙNG","HUY","KHÁ","KHANG K","KHANG 1","KHANG 3","KHANG 4","KHANG 5","KHOA","KIỀU","MINH","NGÂN","NHI","PHÚ","TÂN","THÀNH","THI","THIỆN","THƯ","TRỌNG","TRÚC","TRÚC 3","TRÚC K","TÙNG","VÂN","VIỆT","HẬN","HẬN 1","MY","KHA"];
+let CODES = ["4H","5H","6H","8H","10CP","12CP","15CP","33CP"];
+let MARKETS = ["HQ","NB","TQ"];
+let INSPECTORS = ["Tiến, MTrang"];
+
+// Các danh mục này dùng chung cho mọi người truy cập ứng dụng (lưu dạng shared)
+const CATALOG_FIELDS = {
+  // "ten" dùng chế độ combobox: có thể chọn từ danh sách HOẶC gõ tên mới trực tiếp
+  ten:  {get:()=>NAMES,      set:v=>NAMES=v,      storageKey:'catalog_ten',  label:'Tên người đóng', selId:'f-ten', combo:true, dataListId:'dl-ten'},
+  ma:   {get:()=>CODES,      set:v=>CODES=v,      storageKey:'catalog_ma',   label:'Mã hàng',        selId:'f-ma'},
+  tt:   {get:()=>MARKETS,    set:v=>MARKETS=v,    storageKey:'catalog_tt',   label:'Thị trường',     selId:'f-tt'},
+  nv:   {get:()=>INSPECTORS, set:v=>INSPECTORS=v, storageKey:'catalog_nv',   label:'Nhân viên kiểm phẩm', selId:'f-nv'},
+};
+
+async function loadCatalogs(){
+  for(const key in CATALOG_FIELDS){
+    const f = CATALOG_FIELDS[key];
+    try{
+      const r = await window.storage.get(f.storageKey, true);
+      if(r && r.value){
+        const arr = JSON.parse(r.value);
+        if(Array.isArray(arr) && arr.length) f.set(arr);
+      }
+    }catch(e){ /* chưa có dữ liệu lưu trước đó, dùng danh sách mặc định */ }
+  }
+}
+async function saveCatalog(key){
+  const f = CATALOG_FIELDS[key];
+  try{ await window.storage.set(f.storageKey, JSON.stringify(f.get()), true); }
+  catch(e){ console.error('Lỗi lưu danh mục', e); }
+}
+
+// [key, cột-trong-file-gốc, nhãn hiển thị, nhãn ghi-chú-tự-động]
+const DEFECTS = [
+  ["trayTuoi","H","Trầy tươi","trầy tươi"],
+  ["trayKho","I","Trầy khô","trầy khô"],
+  ["mu","J","Mủ","mủ"],
+  ["ms","K","MS-Dame","ms"],
+  ["domXanh","L","Đốm xanh","đốm xanh"],
+  ["amKhoi","M","Ám khói","ám khói"],
+  ["canTrai","N","Cấn trái","cấn trái"],
+  ["chayThuoc","O","Cháy thuốc","cháy thuốc"],
+  ["domNuoc","P","Đốm nước-thuốc","đốm nước-thuốc"],
+  ["boTri","Q","Bọ trĩ","bọ trĩ"],
+  ["gayCuong","R","Gãy cuống","gãy cuống"],
+  ["dapTrai","S","Dập trái","dập trái"],
+  ["nutTrai","T","Nứt trái","nứt trái"],
+  ["daoCat","U","Dao cắt","dao cắt"],
+  ["nhoDiDang","V","Trái nhỏ dị dạng","trái nhỏ dị dạng"],
+  ["chayTop","W","Cháy tóp dầu","cháy tóp dầu"],
+  ["dapCuong","X","Dập cuống","dập cuống"],
+  ["thoiTrai","Y","Thối trái","thối trái"],
+  ["thieuKg","Z","Thiếu kg","thiếu kg"],
+];
+
+// 3 mức độ lỗi và trọng số quy đổi tương ứng
+const LEVELS = [
+  ["nhe","Nhẹ",0.25],
+  ["tb","TB",0.5],
+  ["nang","Nặng",1],
+];
+
+// Các lỗi từ "Gãy cuống" đến "Thiếu kg" (cột R→Z) trong file nhập liệu chỉ tính
+// là lỗi NẶNG — không chia mức Nhẹ/TB, chỉ nhập 1 số lượng duy nhất (quy về Nặng).
+const HEAVY_ONLY_KEYS = new Set(
+  ["gayCuong","dapTrai","nutTrai","daoCat","nhoDiDang","chayTop","dapCuong","thoiTrai","thieuKg"]
+);
+
+let entries = [];   // toàn bộ phiếu đã lưu (mọi ngày)
+let chisoRows = [];        // [{id, soTrai, coTrai, trongLuong, defects}] — các thùng của phiếu đang nhập, mỗi thùng có bảng lỗi riêng
+
+/* ============================================================
+   PERSISTENCE (window.storage — riêng theo từng người dùng)
+   ============================================================ */
+async function loadEntries(){
+  try{
+    const r = await window.storage.get('entries', false);
+    if(r && r.value) entries = JSON.parse(r.value);
+  }catch(e){ entries = []; }
+  entries.forEach(migrateEntry);
+}
+// Chuyển phiếu nhập theo định dạng cũ sang định dạng mới:
+// - "mỗi thùng có bảng lỗi riêng" (defects nằm trong từng phần tử của chiso[])
+// - lỗi dạng đánh dấu có/không (cũ nhất) -> quy về mức "nặng" để giữ trọng số tương đương
+function migrateEntry(e){
+  if(!Array.isArray(e.chiso)) e.chiso = [];
+  if(typeof e.line !== 'string') e.line = '';
+  if(typeof e.maThung !== 'string') e.maThung = '';
+  if(typeof e.tlThung !== 'number') e.tlThung = Number(e.tlThung)||0;
+  // Chuẩn hoá từng thùng đã có: đảm bảo có object defects đầy đủ 19 loại lỗi
+  e.chiso.forEach(row=>{
+    // Ghi chú lỗi phát sinh thêm: định dạng cũ là 1 chuỗi -> chuyển thành object 3 mức
+    // (đưa chuỗi cũ vào mức "Nặng" để không mất dữ liệu, giống cách quy đổi lỗi cũ bên dưới)
+    if(typeof row.note === 'string'){
+      row.note = row.note ? {nhe:'', tb:'', nang:row.note} : emptyNoteLevels();
+    } else if(!row.note || typeof row.note !== 'object'){
+      row.note = emptyNoteLevels();
+    } else {
+      row.note = {nhe:row.note.nhe||'', tb:row.note.tb||'', nang:row.note.nang||''};
+    }
+    const old = row.defects || {};
+    const nd = emptyDefects ? emptyDefects() : {};
+    DEFECTS.forEach(([key])=>{
+      const d = old[key];
+      let val;
+      if(d && typeof d==='object'){ val = {nhe:Number(d.nhe)||0, tb:Number(d.tb)||0, nang:Number(d.nang)||0}; }
+      else if(d){ val = {nhe:0, tb:0, nang:1}; }
+      else { val = {nhe:0, tb:0, nang:0}; }
+      // Các lỗi từ "Gãy cuống" đến "Thiếu kg": gộp mọi số liệu Nhẹ/TB cũ về Nặng
+      if(HEAVY_ONLY_KEYS.has(key)){ val = {nhe:0, tb:0, nang: val.nhe+val.tb+val.nang}; }
+      nd[key] = val;
+    });
+    row.defects = nd;
+  });
+
+  // Phiếu định dạng cũ hơn: lỗi nằm ở cấp phiếu (e.defects), chưa có bảng lỗi theo thùng
+  if(e.defects && typeof e.defects==='object' && Object.keys(e.defects).length){
+    if(e.chiso.length===0){
+      // chưa có dòng chỉ số nào -> tạo 1 thùng gộp để không mất dữ liệu lỗi cũ
+      e.chiso.push({id:'legacy-'+e.id, soTrai:0, coTrai:'', trongLuong:0, defects: emptyDefects(), note: emptyNoteLevels()});
+    }
+    const target = e.chiso[0];
+    DEFECTS.forEach(([key])=>{
+      const d = e.defects[key];
+      if(!d) return;
+      let nd = (d && typeof d==='object' && ('nhe' in d || 'tb' in d || 'nang' in d))
+        ? {nhe:Number(d.nhe)||0, tb:Number(d.tb)||0, nang:Number(d.nang)||0}
+        : {nhe:0, tb:0, nang:1};
+      // Các lỗi từ "Gãy cuống" đến "Thiếu kg": gộp mọi số liệu Nhẹ/TB cũ về Nặng
+      if(HEAVY_ONLY_KEYS.has(key)){ nd = {nhe:0, tb:0, nang: nd.nhe+nd.tb+nd.nang}; }
+      target.defects[key] = {
+        nhe:(target.defects[key]?.nhe||0)+nd.nhe,
+        tb:(target.defects[key]?.tb||0)+nd.tb,
+        nang:(target.defects[key]?.nang||0)+nd.nang,
+      };
+    });
+    delete e.defects;
+  }
+  return e;
+}
+async function saveEntries(){
+  try{ await window.storage.set('entries', JSON.stringify(entries), false); }
+  catch(e){ console.error('Lỗi lưu dữ liệu', e); }
+}
+
+/* ============================================================
+   INIT UI
+   ============================================================ */
+function fillSelect(sel, arr, withPlaceholder, addNewOption){
+  const prevValue = sel.value;
+  sel.innerHTML='';
+  if(withPlaceholder){
+    const o=document.createElement('option'); o.value=''; o.textContent='— Chọn —'; sel.appendChild(o);
+  }
+  arr.forEach(v=>{
+    const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o);
+  });
+  if(addNewOption){
+    const o=document.createElement('option'); o.value='__add__'; o.textContent='+ Thêm mới…'; sel.appendChild(o);
+  }
+  if(arr.includes(prevValue)) sel.value = prevValue;
+}
+function fillDatalist(dl, arr){
+  if(!dl) return;
+  dl.innerHTML='';
+  arr.forEach(v=>{
+    const o=document.createElement('option'); o.value=v; dl.appendChild(o);
+  });
+}
+function refillAllCatalogSelects(){
+  for(const key in CATALOG_FIELDS){
+    const f = CATALOG_FIELDS[key];
+    if(f.combo){ fillDatalist(document.getElementById(f.dataListId), f.get()); }
+    else{ fillSelect(document.getElementById(f.selId), f.get(), true, true); }
+  }
+}
+
+// Khi chọn "+ Thêm mới…" trong bất kỳ danh sách dạng select nào → mở hộp thoại nhập tên mới
+// (riêng "Tên người đóng" giờ là ô combobox nên có thể gõ tên mới trực tiếp, không cần hộp thoại)
+Object.keys(CATALOG_FIELDS).forEach(key=>{
+  const f = CATALOG_FIELDS[key];
+  if(f.combo) return;
+  document.getElementById(f.selId).addEventListener('change', function(){
+    if(this.value === '__add__'){
+      const prevVal = ''; // reset về placeholder trong lúc chờ nhập
+      this.value = prevVal;
+      openAddItemDialog(key);
+    }
+  });
+});
+
+/* ============================================================
+   CHỈ SỐ & LỖI TRONG 1 THÙNG
+   Mỗi PHIẾU nhập = 1 THÙNG. Bên trong thùng có nhiều dòng "chỉ số"
+   (ứng với từng dòng 1-33 trên mẫu giấy), mỗi chỉ số có: Số trái,
+   Cỡ trái, Trọng lượng và MỘT bảng lỗi riêng (3 mức độ: Nhẹ / TB /
+   Nặng) cho 19 loại lỗi. Cả thùng được tổng hợp lại thành 1 điểm chung.
+   ============================================================ */
+function emptyDefects(){
+  const d = {};
+  DEFECTS.forEach(([key])=>{ d[key] = {nhe:0, tb:0, nang:0}; });
+  return d;
+}
+function emptyNoteLevels(){ return {nhe:'', tb:'', nang:''}; }
+function newChisoRow(){
+  return {
+    id: Date.now()+Math.random().toString(16).slice(2),
+    soTrai:'', coTrai:'', trongLuong:'',
+    defects: emptyDefects(),
+    note: emptyNoteLevels(),
+  };
+}
+function resetChisoRows(){ chisoRows = [newChisoRow()]; renderChisoRows(); }
+
+function defectRowsHtml(rowId, defects){
+  return DEFECTS.map(([key,,label])=>{
+    const d = defects[key] || {nhe:0,tb:0,nang:0};
+    const isHeavyOnly = HEAVY_ONLY_KEYS.has(key);
+    const levelsToShow = isHeavyOnly ? [["nang","Nặng"]] : LEVELS;
+    const inputs = levelsToShow.map(([lvl,lvlLabel])=>`
+      <div class="sev-field lvl-${lvl}">
+        <input type="number" min="0" inputmode="numeric" placeholder="" value="${d[lvl] ? d[lvl] : ''}" data-row="${rowId}" data-key="${key}" data-level="${lvl}">
+        <span class="sev-tag">${lvlLabel}</span>
+      </div>`).join('');
+    const labelHtml = isHeavyOnly ? `${label}<span class="heavy-tag">chỉ tính Nặng</span>` : label;
+    return `<div class="defect-row"><div class="defect-label">${labelHtml}</div><div class="sev-inputs">${inputs}</div></div>`;
+  }).join('');
+}
+function rowDefectCount(row){
+  const {nhe,tb,nang} = sumDefectLevels(row.defects);
+  return nhe+tb+nang;
+}
+
+function renderChisoRows(){
+  const wrap = document.getElementById('chisoList');
+  wrap.innerHTML='';
+  chisoRows.forEach((r,idx)=>{
+    const block = document.createElement('div');
+    block.className='chiso-block';
+    block.innerHTML = `
+      <div class="chiso-block-head">
+        <span class="chiso-block-title">Chỉ số #${idx+1}</span>
+        <div class="chiso-del" data-id="${r.id}">✕</div>
+      </div>
+      <div class="chiso-fields">
+        <div class="mini-field"><label>Số trái</label>
+          <input type="number" min="0" inputmode="numeric" placeholder="0" data-id="${r.id}" data-field="soTrai" value="${r.soTrai}"></div>
+        <div class="mini-field"><label>Cỡ trái</label>
+          <input type="number" min="0" inputmode="numeric" placeholder="0" data-id="${r.id}" data-field="coTrai" value="${r.coTrai}"></div>
+        <div class="mini-field"><label>Trọng lượng (kg)</label>
+          <input type="number" min="0" step="0.1" inputmode="decimal" placeholder="0" data-id="${r.id}" data-field="trongLuong" value="${r.trongLuong}"></div>
+      </div>
+      <details class="chiso-defects">
+        <summary>Lỗi của chỉ số này <span>(đã ghi: <span class="sumcount" data-sumfor="${r.id}">${rowDefectCount(r)}</span>)</span><span class="chev">▾</span></summary>
+        <div class="chiso-defects-body" data-defectbody="${r.id}">
+          ${defectRowsHtml(r.id, r.defects)}
+          <div class="chiso-note-wrap">
+            <label class="chiso-note-label">Ghi chú lỗi phát sinh thêm (không có trong danh mục) — theo mức độ</label>
+            <div class="chiso-note-levels">
+              <div class="chiso-note-item">
+                <span class="chiso-note-tag lvl-nhe">Nhẹ</span>
+                <textarea class="chiso-note-input" data-noteid="${r.id}" data-notelevel="nhe" placeholder="Ghi chú lỗi khác mức Nhẹ…">${(r.note&&r.note.nhe)||''}</textarea>
+              </div>
+              <div class="chiso-note-item">
+                <span class="chiso-note-tag lvl-tb">TB</span>
+                <textarea class="chiso-note-input" data-noteid="${r.id}" data-notelevel="tb" placeholder="Ghi chú lỗi khác mức TB…">${(r.note&&r.note.tb)||''}</textarea>
+              </div>
+              <div class="chiso-note-item">
+                <span class="chiso-note-tag lvl-nang">Nặng</span>
+                <textarea class="chiso-note-input" data-noteid="${r.id}" data-notelevel="nang" placeholder="Ghi chú lỗi khác mức Nặng…">${(r.note&&r.note.nang)||''}</textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>`;
+    wrap.appendChild(block);
+  });
+}
+
+// Nhập Số trái / Cỡ trái / Trọng lượng hoặc số lượng lỗi theo mức độ — dùng ủy quyền sự kiện
+document.getElementById('chisoList').addEventListener('input', (e)=>{
+  const el = e.target;
+  if(el.tagName==='TEXTAREA' && el.dataset.noteid){
+    const row = chisoRows.find(r=>r.id===el.dataset.noteid);
+    if(row){
+      if(!row.note || typeof row.note !== 'object') row.note = emptyNoteLevels();
+      const lvl = el.dataset.notelevel || 'nang';
+      row.note[lvl] = el.value;
+    }
+    return;
+  }
+  if(el.tagName!=='INPUT') return;
+  const rowId = el.dataset.id || el.dataset.row;
+  const row = chisoRows.find(r=>r.id===rowId);
+  if(!row) return;
+  if(el.dataset.field){
+    row[el.dataset.field] = el.value;
+  } else if(el.dataset.key && el.dataset.level){
+    const raw = el.value;
+    let v = raw==='' ? 0 : parseInt(raw);
+    if(isNaN(v) || v<0){ v = 0; el.value=''; } // giá trị không hợp lệ -> để trống, không ép hiện số 0
+    row.defects[el.dataset.key][el.dataset.level] = v;
+    const sumEl = document.querySelector(`.sumcount[data-sumfor="${rowId}"]`);
+    if(sumEl) sumEl.textContent = rowDefectCount(row);
+  }
+  updateScoreCard();
+});
+document.getElementById('chisoList').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.chiso-del');
+  if(!btn) return;
+  if(chisoRows.length<=1){ chisoRows = [newChisoRow()]; }
+  else{ chisoRows = chisoRows.filter(r=>r.id!==btn.dataset.id); }
+  renderChisoRows();
+  updateScoreCard();
+});
+document.getElementById('btnAddChiso').addEventListener('click', ()=>{
+  chisoRows.push(newChisoRow());
+  renderChisoRows();
+  updateScoreCard();
+});
+
+/* ============================================================
+   TÍNH ĐIỂM TỰ ĐỘNG
+   Mỗi PHIẾU = 1 THÙNG. Điểm = (Tổng số trái − Tổng lỗi quy đổi) / Tổng số trái × 100
+   Tổng lỗi quy đổi = SL nhẹ×0.25 + SL trung bình×0.5 + SL nặng×1
+   (cộng dồn lỗi từ TẤT CẢ các dòng "chỉ số" trong thùng/phiếu đó)
+   Điểm hiển thị là SỐ NGUYÊN (làm tròn, không thập phân), giống số
+   khoanh tròn trên mẫu giấy (vd 97).
+   ============================================================ */
+function roundScore2(value){
+  // Điểm hiển thị là số nguyên (không thập phân), giống số khoanh tròn trên mẫu giấy (vd 97)
+  return Math.round(value + 1e-9);
+}
+function sumChisoTrai(rows){
+  return rows.reduce((s,r)=> s + (parseFloat(r.soTrai)||0), 0);
+}
+function sumDefectLevels(defects){
+  let nhe=0, tb=0, nang=0;
+  DEFECTS.forEach(([key])=>{
+    const d = defects[key]; if(!d) return;
+    nhe += Number(d.nhe)||0; tb += Number(d.tb)||0; nang += Number(d.nang)||0;
+  });
+  return {nhe, tb, nang, quyDoi: nhe*0.25 + tb*0.5 + nang*1};
+}
+function sumChisoDefectLevels(rows){
+  let nhe=0, tb=0, nang=0;
+  rows.forEach(r=>{
+    const s = sumDefectLevels(r.defects||{});
+    nhe+=s.nhe; tb+=s.tb; nang+=s.nang;
+  });
+  return {nhe, tb, nang, quyDoi: nhe*0.25 + tb*0.5 + nang*1};
+}
+function calcDiem(tongTrai, tongLoi){
+  if(!tongTrai || tongTrai<=0) return 0;
+  const pct = ((tongTrai - tongLoi) / tongTrai) * 100;
+  return roundScore2(pct);
+}
+function updateScoreCard(){
+  const tongTrai = sumChisoTrai(chisoRows);
+  const {nhe,tb,nang,quyDoi} = sumChisoDefectLevels(chisoRows);
+  const diem = calcDiem(tongTrai, quyDoi);
+  document.getElementById('chisoTotal').textContent = 'Tổng số trái: ' + tongTrai;
+  document.getElementById('statTrai').textContent = tongTrai;
+  document.getElementById('statLoi').textContent = (Math.round(quyDoi*100)/100);
+  document.getElementById('statLevels').textContent = `${nhe} · ${tb} · ${nang}`;
+  document.getElementById('scoreBig').innerHTML = diem + '<span>/100</span>';
+}
+resetChisoRows();
+updateScoreCard();
+
+// Ngày làm việc mặc định = hôm nay
+const dateInput = document.getElementById('workDate');
+dateInput.value = new Date().toISOString().slice(0,10);
+dateInput.addEventListener('change', render);
+
+/* ============================================================
+   TABS
+   ============================================================ */
+const panes = {nhap:document.getElementById('pane-nhap'), list:document.getElementById('pane-list'), sum:document.getElementById('pane-sum')};
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    Object.values(panes).forEach(p=>p.style.display='none');
+    panes[tab.dataset.tab].style.display='block';
+    if(tab.dataset.tab==='list') renderList();
+    if(tab.dataset.tab==='sum') renderSummary();
+  });
+});
+
+/* ============================================================
+   THÊM / CẬP NHẬT PHIẾU
+   ============================================================ */
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+// Gộp ghi chú lỗi phát sinh thêm của tất cả chỉ số trong phiếu, theo từng mức độ
+function combineNotesByLevel(validChiso){
+  const bucket = {nhe:[], tb:[], nang:[]};
+  validChiso.forEach((r,i)=>{
+    LEVELS.forEach(([lvl])=>{
+      const txt = r.note && r.note[lvl];
+      if(txt) bucket[lvl].push(`Chỉ số ${i+1}: ${txt}`);
+    });
+  });
+  return { nhe: bucket.nhe.join('; '), tb: bucket.tb.join('; '), nang: bucket.nang.join('; ') };
+}
+
+let editingId = null; // id phiếu đang được sửa (null = đang ở chế độ Thêm mới)
+const btnAddDefaultHtml = document.getElementById('btnAdd').innerHTML;
+
+function resetAddForm(){
+  document.getElementById('f-ten').value='';
+  document.getElementById('f-loai').value='';
+  document.getElementById('f-ma').value='';
+  document.getElementById('f-mathung').value='';
+  document.getElementById('f-tlthung').value='';
+  resetChisoRows();
+  updateScoreCard();
+}
+
+function exitEditMode(){
+  editingId = null;
+  document.getElementById('btnAdd').innerHTML = btnAddDefaultHtml;
+  document.getElementById('btnCancelEdit').style.display='none';
+}
+
+// Nạp dữ liệu 1 phiếu đã lưu vào form Nhập liệu để chỉnh sửa
+function loadEntryIntoForm(entry){
+  editingId = entry.id;
+  document.getElementById('f-ten').value = entry.ten||'';
+  document.getElementById('f-loai').value = entry.loai||'';
+  document.getElementById('f-ma').value = entry.ma||'';
+  document.getElementById('f-tt').value = entry.tt||'';
+  document.getElementById('f-nv').value = entry.nv||'';
+  document.getElementById('f-line').value = entry.line||'';
+  document.getElementById('f-mathung').value = entry.maThung||'';
+  document.getElementById('f-tlthung').value = entry.tlThung || '';
+
+  const srcChiso = (entry.chiso && entry.chiso.length) ? entry.chiso : [];
+  chisoRows = srcChiso.map(r=>{
+    const d = emptyDefects();
+    DEFECTS.forEach(([key])=>{
+      const v = (r.defects||{})[key];
+      if(v) d[key] = {nhe:Number(v.nhe)||0, tb:Number(v.tb)||0, nang:Number(v.nang)||0};
+    });
+    return {
+      id: Date.now()+Math.random().toString(16).slice(2),
+      soTrai: (r.soTrai===0||r.soTrai) ? String(r.soTrai) : '',
+      coTrai: (r.coTrai===0||r.coTrai) ? String(r.coTrai) : '',
+      trongLuong: (r.trongLuong===0||r.trongLuong) ? String(r.trongLuong) : '',
+      defects: d,
+      note: {
+        nhe: (r.note && r.note.nhe) || '',
+        tb: (r.note && r.note.tb) || '',
+        nang: (r.note && r.note.nang) || '',
+      },
+    };
+  });
+  if(!chisoRows.length) chisoRows = [newChisoRow()];
+  renderChisoRows();
+  updateScoreCard();
+
+  document.getElementById('btnAdd').innerHTML = '✎ Cập nhật phiếu';
+  document.getElementById('btnCancelEdit').style.display='';
+
+  document.getElementById('tabNhap').click();
+  window.scrollTo({top:0, behavior:'smooth'});
+  toast('Đang sửa phiếu của "'+(entry.ten||'')+'"');
+}
+
+document.getElementById('btnCancelEdit').addEventListener('click', ()=>{
+  exitEditMode();
+  resetAddForm();
+  toast('Đã hủy chỉnh sửa');
+});
+
+document.getElementById('btnAdd').addEventListener('click', async ()=>{
+  const tenInput = document.getElementById('f-ten');
+  const ten = tenInput.value.trim();
+  const ma = document.getElementById('f-ma').value;
+  const tt = document.getElementById('f-tt').value;
+  if(!ten || !ma || !tt){
+    toast('Vui lòng nhập đủ Tên, Mã hàng, Thị trường'); return;
+  }
+  const validChiso = chisoRows
+    .filter(r=> r.soTrai!=='' || r.coTrai!=='' || r.trongLuong!=='' || rowDefectCount(r)>0 ||
+      (r.note && (r.note.nhe || r.note.tb || r.note.nang)))
+    .map(r=>{
+      const defectsToSave = {};
+      DEFECTS.forEach(([key])=>{
+        const d = r.defects[key];
+        if(d && (d.nhe>0 || d.tb>0 || d.nang>0)) defectsToSave[key] = {...d};
+      });
+      const rn = r.note || {};
+      return {
+        soTrai: parseFloat(r.soTrai)||0,
+        coTrai: r.coTrai==='' ? '' : Number(r.coTrai),
+        trongLuong: r.trongLuong==='' ? 0 : parseFloat(r.trongLuong)||0,
+        defects: defectsToSave,
+        note: { nhe:(rn.nhe||'').trim(), tb:(rn.tb||'').trim(), nang:(rn.nang||'').trim() },
+      };
+    });
+  const tongTrai = sumChisoTrai(validChiso);
+  if(tongTrai<=0){
+    toast('Vui lòng nhập ít nhất 1 thùng có Số trái > 0'); return;
+  }
+  const {quyDoi} = sumChisoDefectLevels(validChiso);
+  const diem = calcDiem(tongTrai, quyDoi);
+
+  // Ghi chú lỗi phát sinh thêm giờ nằm ở từng chỉ số, theo 3 mức -> gộp lại thành ghi chú chung của phiếu
+  const combinedNote = combineNotesByLevel(validChiso);
+
+  // Tên người đóng có thể được gõ trực tiếp (không chọn từ danh sách) -> tự thêm vào danh mục chung
+  const existsTen = NAMES.some(x=>x.toLowerCase()===ten.toLowerCase());
+  if(!existsTen){
+    NAMES.push(ten);
+    NAMES.sort((a,b)=>a.localeCompare(b,'vi'));
+    await saveCatalog('ten');
+    refillAllCatalogSelects();
+  }
+
+  const isEditing = !!editingId;
+  const entry = {
+    id: editingId || (Date.now()+Math.random().toString(16).slice(2)),
+    date: dateInput.value,
+    ten, loai: document.getElementById('f-loai').value,
+    ma, tt, diem,
+    nv: document.getElementById('f-nv').value,
+    line: document.getElementById('f-line').value.trim(),
+    maThung: document.getElementById('f-mathung').value.trim(),
+    tlThung: parseFloat(document.getElementById('f-tlthung').value)||0,
+    note: combinedNote,
+    chiso: validChiso,
+  };
+
+  if(isEditing){
+    const idx = entries.findIndex(x=>x.id===editingId);
+    if(idx>=0) entries[idx] = entry; else entries.push(entry);
+  } else {
+    entries.push(entry);
+  }
+  saveEntries();
+
+  exitEditMode();
+  // reset form (giữ ngày, thị trường, nhân viên, số line để nhập nhanh liên tục)
+  resetAddForm();
+
+  render();
+  if(isEditing){
+    document.getElementById('tabList').click();
+    toast('Đã cập nhật phiếu của "'+ten+'"');
+  } else {
+    toast('Đã thêm phiếu #'+ entriesForDate(entry.date).length);
+  }
+});
+
+document.getElementById('btnClear').addEventListener('click', ()=>{
+  openConfirm('Xóa toàn bộ dữ liệu', 'Thao tác này sẽ xóa tất cả phiếu đã nhập trên thiết bị này. Bạn chắc chắn chứ?', async ()=>{
+    entries=[]; await saveEntries(); render();
+    toast('Đã xóa toàn bộ dữ liệu');
+  });
+});
+
+/* ============================================================
+   CONFIRM DIALOG
+   ============================================================ */
+const dlg = document.getElementById('confirmDialog');
+let confirmCb=null;
+function openConfirm(title,msg,cb){
+  document.getElementById('confirmTitle').textContent=title;
+  document.getElementById('confirmMsg').textContent=msg;
+  confirmCb=cb; dlg.showModal();
+}
+document.getElementById('confirmCancel').addEventListener('click', ()=>dlg.close());
+document.getElementById('confirmOk').addEventListener('click', ()=>{ dlg.close(); if(confirmCb) confirmCb(); });
+
+/* ============================================================
+   THÊM MỚI VÀO DANH MỤC (Tên / Mã hàng / Thị trường / Nhân viên)
+   ============================================================ */
+const addDlg = document.getElementById('addItemDialog');
+const addInput = document.getElementById('addItemInput');
+let addingKey = null;
+
+function openAddItemDialog(key){
+  addingKey = key;
+  const f = CATALOG_FIELDS[key];
+  document.getElementById('addItemTitle').textContent = 'Thêm ' + f.label.toLowerCase();
+  addInput.value='';
+  addDlg.showModal();
+  setTimeout(()=>addInput.focus(), 50);
+}
+document.getElementById('addItemCancel').addEventListener('click', ()=>{ addDlg.close(); refillAllCatalogSelects(); });
+document.getElementById('addItemOk').addEventListener('click', async ()=>{
+  const val = addInput.value.trim();
+  if(!val){ addInput.focus(); return; }
+  const f = CATALOG_FIELDS[addingKey];
+  const arr = f.get();
+  const exists = arr.some(x=>x.toLowerCase()===val.toLowerCase());
+  if(!exists){
+    arr.push(val);
+    arr.sort((a,b)=>a.localeCompare(b,'vi'));
+    f.set(arr);
+    await saveCatalog(addingKey);
+  }
+  refillAllCatalogSelects();
+  document.getElementById(f.selId).value = exists ? arr.find(x=>x.toLowerCase()===val.toLowerCase()) : val;
+  addDlg.close();
+  toast('Đã thêm "'+val+'" vào '+f.label.toLowerCase());
+});
+addInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); document.getElementById('addItemOk').click(); } });
+
+/* ============================================================
+   RENDER — LIST
+   ============================================================ */
+function entriesForDate(d){ return entries.filter(e=>e.date===d); }
+
+function levelText(d){
+  const bits=[];
+  if(d.nhe) bits.push('nhẹ '+d.nhe);
+  if(d.tb) bits.push('TB '+d.tb);
+  if(d.nang) bits.push('nặng '+d.nang);
+  return bits.join(', ');
+}
+// Gộp lỗi từ tất cả các thùng (chiso[].defects) của 1 phiếu thành 1 object {key:{nhe,tb,nang}}
+function aggregateEntryDefects(entry){
+  const agg = {};
+  (entry.chiso||[]).forEach(row=>{
+    const d = row.defects || {};
+    DEFECTS.forEach(([key])=>{
+      const v = d[key]; if(!v) return;
+      if(!agg[key]) agg[key] = {nhe:0, tb:0, nang:0};
+      agg[key].nhe += Number(v.nhe)||0;
+      agg[key].tb += Number(v.tb)||0;
+      agg[key].nang += Number(v.nang)||0;
+    });
+  });
+  return agg;
+}
+// Ghi chú lỗi tự động — gộp cả lỗi trong danh mục và ghi chú lỗi phát sinh thêm,
+// nhóm theo 3 mức độ Nhẹ / TB / Nặng để dễ đối chiếu khi xuất Excel.
+function noteFor(entry){
+  const defects = aggregateEntryDefects(entry);
+  const groups = {nhe:[], tb:[], nang:[]};
+  DEFECTS.forEach(([k,,,short])=>{
+    const d = defects[k]; if(!d) return;
+    LEVELS.forEach(([lvl])=>{
+      const v = Number(d[lvl])||0;
+      if(v>0) groups[lvl].push(`${short} (${v})`);
+    });
+  });
+  if(entry.note && typeof entry.note === 'object'){
+    LEVELS.forEach(([lvl])=>{
+      if(entry.note[lvl]) groups[lvl].push(entry.note[lvl]);
+    });
+  } else if(entry.note){
+    groups.nang.push(entry.note);
+  }
+  const parts = [];
+  LEVELS.forEach(([lvl,lbl])=>{
+    if(groups[lvl].length) parts.push(`${lbl}: ${groups[lvl].join(', ')}`);
+  });
+  return parts.join(' | ');
+}
+function chisoNoteText(note){
+  if(!note) return '';
+  if(typeof note === 'string') return note;
+  const parts=[];
+  LEVELS.forEach(([lvl,lbl])=>{ if(note[lvl]) parts.push(`${lbl}: ${note[lvl]}`); });
+  return parts.join(' | ');
+}
+function entryTongTrai(entry){ return sumChisoTrai(entry.chiso||[]); }
+function entryTongLoi(entry){ return sumChisoDefectLevels(entry.chiso||[]).quyDoi; }
+
+function renderList(){
+  const list = document.getElementById('entryList');
+  const day = entriesForDate(dateInput.value);
+  list.innerHTML='';
+  document.getElementById('emptyList').style.display = day.length? 'none':'block';
+  day.forEach((e,idx)=>{
+    const div=document.createElement('div');
+    div.className='entry';
+    const defectsTxt = noteFor(e);
+    const tongTrai = entryTongTrai(e);
+    const tongLoi = Math.round(entryTongLoi(e)*100)/100;
+    div.innerHTML = `
+      <div class="entry-top">
+        <div>
+          <div class="entry-name">#${idx+1} · ${e.ten}${e.loai?' · '+e.loai:''}${e.line?' · Line '+e.line:''}</div>
+          <div class="entry-sub">${e.ma} · ${e.tt}${e.nv?' · '+e.nv:''}</div>
+          <div class="entry-sub">${e.maThung?'Mã thùng: '+e.maThung+' · ':''}${e.tlThung?'TL thùng: '+e.tlThung+'kg · ':''}Số trái: ${tongTrai} · Tổng lỗi: ${tongLoi}</div>
+        </div>
+        <div class="entry-score">${Math.round(e.diem||0)}</div>
+      </div>
+      ${defectsTxt? `<div class="entry-defects">${defectsTxt}</div>`:''}
+      <div class="entry-actions">
+        <button class="mini-btn edit" data-id="${e.id}">Sửa phiếu</button>
+        <button class="mini-btn del" data-id="${e.id}">Xóa phiếu</button>
+      </div>`;
+    div.querySelector('.edit').addEventListener('click', ()=>{
+      loadEntryIntoForm(e);
+    });
+    div.querySelector('.del').addEventListener('click', ()=>{
+      openConfirm('Xóa phiếu này', `Xóa phiếu #${idx+1} của "${e.ten}"?`, async ()=>{
+        entries = entries.filter(x=>x.id!==e.id);
+        await saveEntries(); render();
+        toast('Đã xóa phiếu');
+      });
+    });
+    list.appendChild(div);
+  });
+}
+
+/* ============================================================
+   RENDER — SUMMARY (giống sheet "Tổng hợp lỗi theo người")
+   ============================================================ */
+function renderSummary(){
+  const day = entriesForDate(dateInput.value);
+  document.getElementById('sumDateLabel').textContent = fmtDate(dateInput.value);
+  const table = document.getElementById('sumTable');
+  if(!day.length){
+    table.innerHTML = `<tr><td style="padding:20px;color:var(--ink-soft);">Chưa có dữ liệu ngày này</td></tr>`;
+    return;
+  }
+  // group theo người
+  const byPerson = {};
+  day.forEach(e=>{
+    if(!byPerson[e.ten]) byPerson[e.ten] = {count:0, scoreSum:0, tongTrai:0, nhe:0, tb:0, nang:0, defects:{}};
+    const p = byPerson[e.ten];
+    const defects = aggregateEntryDefects(e);
+    p.count++; p.scoreSum += (e.diem||0);
+    p.tongTrai += entryTongTrai(e);
+    DEFECTS.forEach(([k])=>{
+      const d = defects[k]; if(!d) return;
+      p.defects[k] = (p.defects[k]||0) + (Number(d.nhe)||0) + (Number(d.tb)||0) + (Number(d.nang)||0);
+      p.nhe += Number(d.nhe)||0; p.tb += Number(d.tb)||0; p.nang += Number(d.nang)||0;
+    });
+  });
+  // chỉ hiện cột lỗi có phát sinh ít nhất 1 lần trong ngày
+  const usedDefects = DEFECTS.filter(([k])=> Object.values(byPerson).some(p=>p.defects[k]));
+
+  let head = `<tr><th>#</th><th>Người đóng</th><th>Số phiếu</th><th>Số trái</th>`;
+  usedDefects.forEach(([,,label])=> head += `<th>${label.replace(/\n/g,' ')}</th>`);
+  head += `<th>Nhẹ</th><th>TB</th><th>Nặng</th><th>Tổng lỗi</th><th>Điểm chung</th><th>Điểm TB</th></tr>`;
+
+  let body='';
+  Object.entries(byPerson).forEach(([name,p], i)=>{
+    const quyDoi = p.nhe*0.25 + p.tb*0.5 + p.nang*1;
+    const diemChung = calcDiem(p.tongTrai, quyDoi);
+    body += `<tr><td>${i+1}</td><td>${name}</td><td>${p.count}</td><td>${p.tongTrai}</td>`;
+    usedDefects.forEach(([k])=> body += `<td>${p.defects[k]||0}</td>`);
+    body += `<td>${p.nhe}</td><td>${p.tb}</td><td>${p.nang}</td><td>${Math.round(quyDoi*100)/100}</td><td>${diemChung}</td><td>${Math.round(p.scoreSum/p.count)}</td></tr>`;
+  });
+  table.innerHTML = head+body;
+}
+
+function fmtDate(iso){
+  if(!iso) return '';
+  const [y,m,d]=iso.split('-');
+  return `${d}/${m}/${y.slice(2)}`;
+}
+
+/* ============================================================
+   RENDER — chung
+   ============================================================ */
+function render(){
+  const day = entriesForDate(dateInput.value);
+  document.getElementById('countPill').textContent = day.length+' phiếu';
+  document.getElementById('listBadge').textContent = day.length;
+  renderList();
+  const sumVisible = panes.sum.style.display!=='none';
+  if(sumVisible) renderSummary();
+}
+
+/* ============================================================
+   XUẤT EXCEL — đúng cấu trúc sheet "Nhập liệu nhanh"
+   ============================================================ */
+document.getElementById('btnExport').addEventListener('click', ()=>{
+  if(typeof XLSX === 'undefined'){
+    openConfirm(
+      'Chưa tải được thư viện Excel',
+      'Ứng dụng cần kết nối Internet để tải thư viện xuất file (một lần). Vui lòng: (1) Kiểm tra mạng Wi-Fi/4G, (2) Mở file này bằng trình duyệt Safari/Chrome thật (không mở bằng trình xem file/Quick Look), (3) Tải lại trang rồi thử lại.',
+      ()=>{}
+    );
+    document.getElementById('confirmOk').textContent = 'Đã hiểu';
+    document.getElementById('confirmOk').className = 'btn btn-primary';
+    document.getElementById('confirmCancel').style.display = 'none';
+    dlg.addEventListener('close', ()=>{
+      document.getElementById('confirmOk').textContent = 'Xóa';
+      document.getElementById('confirmOk').className = 'btn btn-danger';
+      document.getElementById('confirmCancel').style.display = '';
+    }, {once:true});
+    return;
+  }
+  const day = entriesForDate(dateInput.value);
+  if(!day.length){ toast('Chưa có phiếu nào để xuất'); return; }
+  doExport(day).catch(err=>{
+    console.error(err);
+    openConfirm('Xuất file thất bại', 'Lỗi: ' + (err && err.message ? err.message : err) + '\n\nHãy thử mở file bằng Chrome/Mi Browser thật (không phải trình xem file) rồi thử lại.', ()=>{});
+    document.getElementById('confirmOk').textContent = 'Đã hiểu';
+    document.getElementById('confirmOk').className = 'btn btn-primary';
+    document.getElementById('confirmCancel').style.display = 'none';
+    dlg.addEventListener('close', ()=>{
+      document.getElementById('confirmOk').textContent = 'Xóa';
+      document.getElementById('confirmOk').className = 'btn btn-danger';
+      document.getElementById('confirmCancel').style.display = '';
+    }, {once:true});
+  });
+});
+
+function buildWorkbookBlob(day){
+  const headers = ["","STT","Tên người đóng","Số line","Loại","Mã Hàng","Thị trường","Mã thùng","Trọng lượng thùng (kg)","Tổng số trái","Điểm"];
+  DEFECTS.forEach(([,,label])=>{
+    headers.push(label+" (Nhẹ)", label+" (TB)", label+" (Nặng)");
+  });
+  headers.push("Tổng lỗi quy đổi","Ghi chú lỗi thêm (Nhẹ)","Ghi chú lỗi thêm (TB)","Ghi chú lỗi thêm (Nặng)","Ghi chú lỗi (tự động)","Nhân viên kiểm phẩm");
+
+  const rows = [headers];
+  day.forEach((e,idx)=>{
+    const tongTrai = entryTongTrai(e);
+    const tongLoi = Math.round(entryTongLoi(e)*100)/100;
+    const aggDefects = aggregateEntryDefects(e);
+    const row = [
+      idx===0 ? fmtDate(e.date) : "",
+      idx+1, e.ten, e.line||"", e.loai||"", e.ma, e.tt, e.maThung||"", e.tlThung||"", tongTrai, e.diem
+    ];
+    DEFECTS.forEach(([k])=>{
+      const d = aggDefects[k] || {nhe:0,tb:0,nang:0};
+      row.push(d.nhe||"", d.tb||"", d.nang||"");
+    });
+    const en = (e.note && typeof e.note==='object') ? e.note : {nhe:'',tb:'',nang:(e.note||'')};
+    row.push(tongLoi);
+    row.push(en.nhe||"");
+    row.push(en.tb||"");
+    row.push(en.nang||"");
+    row.push(noteFor(e));
+    row.push(e.nv||"");
+    rows.push(row);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:9},{wch:5},{wch:14},{wch:9},{wch:9},{wch:8},{wch:9},{wch:10},{wch:12},{wch:9},{wch:7},
+    ...DEFECTS.flatMap(()=>[{wch:7},{wch:7},{wch:7}]), {wch:9},{wch:20},{wch:20},{wch:20},{wch:34},{wch:16}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Nhập liệu nhanh");
+
+  // sheet chi tiết chỉ số theo từng dòng/thùng
+  const chisoRowsAoa = buildChisoDetailAoa(day);
+  const ws3 = XLSX.utils.aoa_to_sheet(chisoRowsAoa);
+  ws3['!cols'] = [{wch:5},{wch:14},{wch:6},{wch:9},{wch:9},{wch:14},{wch:34}];
+  XLSX.utils.book_append_sheet(wb, ws3, "Chi tiết chỉ số (thùng)");
+
+  // sheet tổng hợp
+  const sumRows = buildSummaryAoa(day);
+  const ws2 = XLSX.utils.aoa_to_sheet(sumRows);
+  XLSX.utils.book_append_sheet(wb, ws2, "Tổng hợp theo người");
+
+  const fname = `Danh_gia_chat_luong_${dateInput.value}.xlsx`;
+  // Lấy ra dạng ArrayBuffer thay vì để XLSX tự tải file —
+  // trên một số trình duyệt di động (vd. Mi Browser mở file tải từ OneDrive),
+  // cách tải "âm thầm" qua thẻ <a download> bị chặn nhưng không báo lỗi gì,
+  // nên phiếu "báo đã xuất" nhưng thực ra không có file nào được lưu.
+  const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+  const mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  const blob = new Blob([wbout], {type: mime});
+  return {blob, fname, buffer: wbout, mime};
+}
+
+// Chuyển ArrayBuffer -> base64 theo từng khối nhỏ để không bị tràn stack
+// với file lớn. Dùng cho link data: URI — cách này KHÔNG bị chặn trên các
+// trang mở từ file:// (mở trực tiếp file tải về từ OneDrive), khác với
+// blob: URL hay bị Mi Browser/Chrome-Android âm thầm từ chối tải khi
+// trang có nguồn gốc file://.
+function bufferToBase64(buffer){
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunk = 0x8000;
+  for(let i=0; i<bytes.length; i+=chunk){
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+  }
+  return btoa(binary);
+}
+
+async function doExport(day){
+  const {blob, fname, buffer, mime} = buildWorkbookBlob(day);
+  const dataUrl = 'data:' + mime + ';base64,' + bufferToBase64(buffer);
+
+  // Cách 1 (ưu tiên trên điện thoại): dùng khay chia sẻ của hệ điều hành.
+  // Đây là cách chắc chắn nhất trên Mi Browser / Chrome Android vì chính
+  // người dùng chọn nơi lưu (Bộ nhớ máy, OneDrive, Zalo, Drive...), nên
+  // không còn tình trạng "báo xuất xong mà không biết file nằm đâu".
+  try{
+    const file = new File([blob], fname, {type: blob.type});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({
+        files:[file],
+        title: fname,
+        text: 'File đánh giá chất lượng chuối ngày ' + fmtDate(dateInput.value)
+      });
+      toast('Đã xuất file '+fname);
+      return;
+    }
+  }catch(shareErr){
+    // Người dùng bấm Hủy trên khay chia sẻ -> không coi là lỗi, không rơi xuống cách 2
+    if(shareErr && shareErr.name === 'AbortError'){ return; }
+    console.warn('Chia sẻ file thất bại, thử cách tải xuống thông thường:', shareErr);
+  }
+
+  // Cách 2: tải bằng link data: URI (không dùng blob: nữa) — vì trang này
+  // được mở trực tiếp từ file:// (file tải về từ OneDrive), Mi Browser/
+  // Chrome-Android thường âm thầm từ chối tải các link blob: trên trang
+  // file://, nhưng link data: thì không bị chặn kiểu đó.
+  const a = document.createElement('a');
+  a.href = dataUrl; a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  // Cách 3: luôn kèm sẵn một liên kết thủ công trong hộp thoại, phòng khi
+  // cách 2 vẫn không tự chạy (một số bản Mi Browser cần người dùng bấm
+  // trực tiếp vào link, không nhận cú click bằng script).
+  openConfirm(
+    'Đã tạo file — nhấn để lưu',
+    'Nếu không thấy file trong "Tải xuống" (Download) của máy, hãy chạm giữ vào liên kết bên dưới rồi chọn "Tải xuống liên kết / Download link" (không chọn "Sao chép URL"):',
+    ()=>{}
+  );
+  const msgEl = document.getElementById('confirmMsg');
+  const link = document.createElement('a');
+  link.href = dataUrl; link.download = fname; link.textContent = '⬇ ' + fname;
+  link.style.cssText = 'display:block;margin-top:10px;font-weight:800;color:var(--leaf-deep);word-break:break-all;';
+  msgEl.appendChild(document.createElement('br'));
+  msgEl.appendChild(link);
+  document.getElementById('confirmOk').textContent = 'Đã hiểu';
+  document.getElementById('confirmOk').className = 'btn btn-primary';
+  document.getElementById('confirmCancel').style.display = 'none';
+  dlg.addEventListener('close', ()=>{
+    document.getElementById('confirmOk').textContent = 'Xóa';
+    document.getElementById('confirmOk').className = 'btn btn-danger';
+    document.getElementById('confirmCancel').style.display = '';
+  }, {once:true});
+  toast('Đã tạo file '+fname);
+}
+
+function buildChisoDetailAoa(day){
+  const head = ["STT phiếu (thùng)","Tên người đóng","Chỉ số #","Số trái","Cỡ trái","Trọng lượng (kg)","Ghi chú lỗi phát sinh"];
+  const rows = [["Chi tiết từng chỉ số — theo phiếu (mỗi phiếu = 1 thùng)"], head];
+  day.forEach((e,idx)=>{
+    (e.chiso||[]).forEach((r,ri)=>{
+      rows.push([idx+1, e.ten, ri+1, r.soTrai||0, r.coTrai==='' ? "" : r.coTrai, r.trongLuong||0, chisoNoteText(r.note)]);
+    });
+  });
+  return rows;
+}
+
+function buildSummaryAoa(day){
+  const byPerson={};
+  day.forEach(e=>{
+    if(!byPerson[e.ten]) byPerson[e.ten]={count:0,scoreSum:0,tongTrai:0,nhe:0,tb:0,nang:0,defects:{}};
+    const p=byPerson[e.ten]; const defects=aggregateEntryDefects(e);
+    p.count++; p.scoreSum+=(e.diem||0); p.tongTrai+=entryTongTrai(e);
+    DEFECTS.forEach(([k])=>{
+      const d=defects[k]; if(!d) return;
+      p.defects[k]=(p.defects[k]||0)+(Number(d.nhe)||0)+(Number(d.tb)||0)+(Number(d.nang)||0);
+      p.nhe+=Number(d.nhe)||0; p.tb+=Number(d.tb)||0; p.nang+=Number(d.nang)||0;
+    });
+  });
+  const usedDefects = DEFECTS.filter(([k])=> Object.values(byPerson).some(p=>p.defects[k]));
+  const head = ["STT","Tên người đóng","Số phiếu","Tổng số trái", ...usedDefects.map(([,,l])=>l),
+    "Nhẹ","TB","Nặng","Tổng lỗi quy đổi","Điểm chung","Điểm TB"];
+  const rows=[[`Tổng hợp ngày ${fmtDate(day[0].date)}`], head];
+  Object.entries(byPerson).forEach(([name,p],i)=>{
+    const quyDoi = p.nhe*0.25 + p.tb*0.5 + p.nang*1;
+    const diemChung = calcDiem(p.tongTrai, quyDoi);
+    rows.push([i+1, name, p.count, p.tongTrai, ...usedDefects.map(([k])=>p.defects[k]||0),
+      p.nhe, p.tb, p.nang, +quyDoi.toFixed(2), diemChung, Math.round(p.scoreSum/p.count)]);
+  });
+  return rows;
+}
+
+/* ============================================================
+   START
+   ============================================================ */
+(async function init(){
+  const locked = await checkLockStatus();
+  if(locked){
+    showLockedScreen();
+    return;
+  }
+  await loadCatalogs();
+  refillAllCatalogSelects();
+  await loadEntries();
+  render();
+  if(typeof XLSX === 'undefined'){
+    setTimeout(()=>{
+      if(typeof XLSX === 'undefined') toast('⚠️ Chưa tải được tính năng xuất Excel — kiểm tra kết nối mạng');
+    }, 2500);
+  }
+})();
+</script>
+</body>
+</html>
